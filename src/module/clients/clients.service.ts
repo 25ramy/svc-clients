@@ -4,9 +4,9 @@ import { Client } from 'src/database/entities/client.entity';
 import { EntityManager } from 'typeorm';
 import {
   ApiClient,
+  ApiClientStats,
+  ApiClientWithDeathDate,
   ApiCreateClient,
-  ClientStats,
-  ClientWithDeathDate,
 } from './clients.payload';
 
 @Injectable()
@@ -71,46 +71,46 @@ export class ClientsService {
     }
   }
 
-  async getClientStats(): Promise<ClientStats> {
-    const clients = await this.entityManager.find(Client);
-
-    if (!clients.length) {
-      return { averageAge: 0, standardDeviation: 0 };
-    }
-
-    const ages = clients.map((client) => client.age);
-    const average = ages.reduce((acc, age) => acc + age, 0) / ages.length;
-
-    const squareDiffs = ages.map((age) => {
-      const diff = age - average;
-      return diff * diff;
-    });
-    const avgSquareDiff =
-      squareDiffs.reduce((acc, val) => acc + val, 0) / ages.length;
-    const standardDeviation = Math.sqrt(avgSquareDiff);
+  async getClientStats(): Promise<ApiClientStats> {
+    const stats = await this.entityManager
+      .createQueryBuilder(Client, 'client')
+      .select([
+        'ROUND(AVG(CAST(client.age as FLOAT)), 2) as "averageAge"',
+        'ROUND(SQRT(AVG(POWER(CAST(client.age as FLOAT) - (SELECT AVG(CAST(age as FLOAT)) FROM client), 2))), 2) as "standardDeviation"',
+      ])
+      .getRawOne<{ averageAge: string; standardDeviation: string }>();
 
     return {
-      averageAge: Number(average.toFixed(2)),
-      standardDeviation: Number(standardDeviation.toFixed(2)),
+      averageAge: Number(stats?.averageAge ?? 0),
+      standardDeviation: Number(stats?.standardDeviation ?? 0),
     };
   }
 
-  async getClientsWithDeathDate(): Promise<ClientWithDeathDate[]> {
-    const clients = await this.entityManager.find(Client);
+  async getClientsWithDeathDate(): Promise<ApiClientWithDeathDate[]> {
     const LIFE_EXPECTANCY = 80;
 
-    return clients.map((client) => {
-      const yearsLeft = LIFE_EXPECTANCY - (client.age || 0);
-      const expectedDeathDate = new Date();
-      expectedDeathDate.setFullYear(
-        expectedDeathDate.getFullYear() + yearsLeft,
-      );
+    const clients = await this.entityManager
+      .createQueryBuilder(Client, 'client')
+      .select([
+        'client.id as "id"',
+        'client.name as "name"',
+        'client.lastName as "lastName"',
+        'client.age as "age"',
+        'client.birthDate as "birthDate"',
+        `date('now', '+' || (${LIFE_EXPECTANCY} - COALESCE(client.age, 0)) || ' years') as "expectedDeathDate"`,
+      ])
+      .getRawMany<
+        Omit<ApiClient, 'birthDate'> & {
+          birthDate: string | null;
+          expectedDeathDate: string;
+        }
+      >();
 
-      return {
-        ...this.mapEntityToDTO(client),
-        expectedDeathDate,
-      };
-    });
+    return clients.map((client) => ({
+      ...client,
+      birthDate: client.birthDate ? new Date(client.birthDate) : new Date(),
+      expectedDeathDate: new Date(client.expectedDeathDate),
+    }));
   }
 
   private mapEntityToDTO(user: Client): ApiClient {

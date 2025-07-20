@@ -2,9 +2,9 @@ import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import {
   ApiClient,
+  ApiClientStats,
+  ApiClientWithDeathDate,
   ApiCreateClient,
-  ClientStats,
-  ClientWithDeathDate,
 } from './clients.payload';
 import { ClientsService } from './clients.service';
 
@@ -23,12 +23,12 @@ export class ClientsController {
   }
 
   @MessagePattern({ cmd: 'get_client_stats' })
-  getClientStats(): Promise<ClientStats> {
+  getClientStats(): Promise<ApiClientStats> {
     return this.clientsService.getClientStats();
   }
 
   @MessagePattern({ cmd: 'get_clients_with_death_date' })
-  getClientsWithDeathDate(): Promise<ClientWithDeathDate[]> {
+  getClientsWithDeathDate(): Promise<ApiClientWithDeathDate[]> {
     return this.clientsService.getClientsWithDeathDate();
   }
 }
