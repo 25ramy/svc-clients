@@ -18,9 +18,6 @@ export class ClientsService {
   ping(): { response: string } {
     return { response: 'pong from svc-clients!' };
   }
-  getHello(): string {
-    return 'Hello World!';
-  }
 
   async createClient(payload: ApiCreateClient): Promise<ApiClient> {
     const { name, lastName, age, birthDate } = payload;
@@ -71,10 +68,10 @@ export class ClientsService {
 
   async getClientStats(): Promise<ApiClientStats> {
     const stats = await this.entityManager
-      .createQueryBuilder(Client, 'client')
+      .createQueryBuilder(Client, 'clients')
       .select([
-        'ROUND(AVG(CAST(client.age as FLOAT)), 2) as "averageAge"',
-        'ROUND(SQRT(AVG(POWER(CAST(client.age as FLOAT) - (SELECT AVG(CAST(age as FLOAT)) FROM client), 2))), 2) as "standardDeviation"',
+        'ROUND(AVG(CAST(clients.age as FLOAT)), 2) as "averageAge"',
+        'ROUND(SQRT(AVG(POWER(CAST(clients.age as FLOAT) - (SELECT AVG(CAST(age as FLOAT)) FROM clients), 2))), 2) as "standardDeviation"',
       ])
       .getRawOne<{ averageAge: string; standardDeviation: string }>();
 
@@ -88,14 +85,14 @@ export class ClientsService {
     const LIFE_EXPECTANCY = 80;
 
     const clients = await this.entityManager
-      .createQueryBuilder(Client, 'client')
+      .createQueryBuilder(Client, 'clients')
       .select([
-        'client.id as "id"',
-        'client.name as "name"',
-        'client.lastName as "lastName"',
-        'client.age as "age"',
-        'client.birthDate as "birthDate"',
-        `date('now', '+' || (${LIFE_EXPECTANCY} - COALESCE(client.age, 0)) || ' years') as "expectedDeathDate"`,
+        'clients.id as "id"',
+        'clients.name as "name"',
+        'clients.lastName as "lastName"',
+        'clients.age as "age"',
+        'clients.birthDate as "birthDate"',
+        `date('now', '+' || (${LIFE_EXPECTANCY} - COALESCE(clients.age, 0)) || ' years') as "expectedDeathDate"`,
       ])
       .getRawMany<
         Omit<ApiClient, 'birthDate'> & {
