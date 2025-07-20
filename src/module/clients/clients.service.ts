@@ -47,13 +47,13 @@ export class ClientsService {
       }
     }
 
-    const existingUser = await this.entityManager.findOne(Client, {
+    /*     const existingUser = await this.entityManager.findOne(Client, {
       where: { name },
     });
 
     if (existingUser) {
       throw new BadRequestException('Client already exists');
-    }
+    } */
 
     try {
       const user = this.entityManager.create(Client, {
@@ -62,9 +62,7 @@ export class ClientsService {
         age,
         birthDate: new Date(birthDate),
       });
-
       const client = await this.entityManager.save(user);
-
       return this.mapEntityToDTO(client);
     } catch (error) {
       throw new BadRequestException('Error creating client: ' + error);
