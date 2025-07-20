@@ -1,24 +1,11 @@
-//this should be on a npm package to be type-safe cross app
-export interface ApiCreateClient {
-  name: string;
-  lastName: string;
-  age: number;
-  birthDate: string;
-}
+import {
+  CreateClientDto,
+  ClientDto,
+  ClientStatsDto,
+  ClientWithDeathDateDto,
+} from '@type-safe-app/types';
 
-export interface ApiClient {
-  id: number;
-  name: string;
-  lastName: string;
-  age: number;
-  birthDate: Date;
-}
-
-export interface ApiClientStats {
-  averageAge: number;
-  standardDeviation: number;
-}
-
-export interface ApiClientWithDeathDate extends ApiClient {
-  expectedDeathDate: Date;
-}
+export type ApiCreateClient = CreateClientDto;
+export type ApiClient = ClientDto;
+export type ApiClientStats = ClientStatsDto;
+export type ApiClientWithDeathDate = ClientWithDeathDateDto;

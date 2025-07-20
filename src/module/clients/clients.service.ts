@@ -33,6 +33,10 @@ export class ClientsService {
       );
     }
 
+    if (!birthDate) {
+      throw new BadRequestException('Birth date is required');
+    }
+
     if (birthDate) {
       const date = new Date(birthDate);
       if (isNaN(date.getTime())) {
