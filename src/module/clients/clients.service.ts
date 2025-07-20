@@ -15,8 +15,8 @@ export class ClientsService {
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
   ) {}
-  ping(): string {
-    return 'pong from svc-clients!';
+  ping(): { response: string } {
+    return { response: 'pong from svc-clients!' };
   }
   getHello(): string {
     return 'Hello World!';

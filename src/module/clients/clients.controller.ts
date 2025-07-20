@@ -13,7 +13,7 @@ export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 
   @MessagePattern({ cmd: 'ping' })
-  ping(): string {
+  ping(): { response: string } {
     return this.clientsService.ping();
   }
 
