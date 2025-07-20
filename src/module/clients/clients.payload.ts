@@ -1,3 +1,4 @@
+//this should be on a npm package to be type-safe cross app
 export interface ApiCreateClient {
   name: string;
   lastName: string;
