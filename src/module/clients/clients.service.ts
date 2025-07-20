@@ -92,7 +92,7 @@ export class ClientsService {
         'clients.lastName as "lastName"',
         'clients.age as "age"',
         'clients.birthDate as "birthDate"',
-        `date('now', '+' || (${LIFE_EXPECTANCY} - COALESCE(clients.age, 0)) || ' years') as "expectedDeathDate"`,
+        `datetime(clients.birthDate, '+${LIFE_EXPECTANCY} years') as "expectedDeathDate"`,
       ])
       .getRawMany<
         Omit<ApiClient, 'birthDate'> & {
