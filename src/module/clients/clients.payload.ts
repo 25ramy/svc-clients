@@ -1,8 +1,8 @@
 import {
-  CreateClientDto,
   ClientDto,
   ClientStatsDto,
   ClientWithDeathDateDto,
+  CreateClientDto,
 } from '@type-safe-app/types';
 
 export type ApiCreateClient = CreateClientDto;
