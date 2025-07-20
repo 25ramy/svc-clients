@@ -12,3 +12,12 @@ export interface ApiClient {
   age: number;
   birthDate: Date;
 }
+
+export interface ClientStats {
+  averageAge: number;
+  standardDeviation: number;
+}
+
+export interface ClientWithDeathDate extends ApiClient {
+  expectedDeathDate: Date;
+}
