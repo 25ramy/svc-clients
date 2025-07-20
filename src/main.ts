@@ -1,17 +1,18 @@
+import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { Transport } from '@nestjs/microservices';
 import { AppModule } from './app.module';
 
+const logger = new Logger();
 async function bootstrap() {
   const app = await NestFactory.createMicroservice(AppModule, {
+    transport: Transport.TCP,
     options: {
-      transport: Transport.TCP || 'TCP',
-      options: {
-        host: process.env.HOST || 'localhost',
-        port: parseInt(process.env.PORT ?? '3001'),
-      },
+      host: process.env.HOST || 'localhost',
+      port: process.env.PORT || 3001,
     },
   });
+  logger.log(`svc clients is running on: ${process.env.PORT ?? '3001'}`);
   await app.listen();
 }
 bootstrap();
